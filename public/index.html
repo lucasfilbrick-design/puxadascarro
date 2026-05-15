@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Laudos de vistoria veicular rápidos e precisos. Conformidade garantida para transferência, regularização e verificação.">
+<title>Vistoriador Online | Consulte Veículos pela Placa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset & Base ─────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#f4f6f9;color:#1a1a2e;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+input{font-family:inherit;outline:none}
+
+/* ─── Tokens ───────────────────────────────────────────────────────────── */
+:root{
+  --blue:#008cdd;
+  --blue-dark:#015e94;
+  --blue-light:#30a2e4;
+  --blue-bg:#e8f4fb;
+  --green:#2eb84b;
+  --green-bg:#e8f8ec;
+  --yellow:#fab515;
+  --yellow-bg:#fef8e7;
+  --red:#d94a2b;
+  --red-bg:#fdecea;
+  --gray:#6b7280;
+  --gray-light:#e5e7eb;
+  --white:#ffffff;
+  --card-shadow:0 2px 12px rgba(0,0,0,.08);
+  --radius:12px;
+  --radius-sm:8px;
+}
+
+/* ─── Layout helpers ───────────────────────────────────────────────────── */
+.container{max-width:900px;margin:0 auto;padding:0 20px}
+.hidden{display:none!important}
+.fade-in{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── Header ───────────────────────────────────────────────────────────── */
+.site-header{
+  background:linear-gradient(135deg,var(--blue-dark) 0%,var(--blue) 100%);
+  padding:14px 0;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 8px rgba(1,94,148,.3);
+}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:1.15rem}
+.logo-icon{
+  width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+}
+.logo-badge{
+  font-size:.65rem;font-weight:600;background:var(--green);color:#fff;
+  padding:2px 7px;border-radius:20px;margin-left:4px;text-transform:uppercase;letter-spacing:.04em;
+}
+.header-phone{color:rgba(255,255,255,.85);font-size:.85rem;display:flex;align-items:center;gap:6px}
+
+/* ─── Hero ─────────────────────────────────────────────────────────────── */
+.hero{
+  background:linear-gradient(160deg,var(--blue-dark) 0%,#0077c8 60%,var(--blue-light) 100%);
+  padding:70px 0 80px;text-align:center;color:#fff;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3E%3Ccircle cx='650' cy='80' r='180' fill='rgba(255,255,255,.04)'/%3E%3Ccircle cx='100' cy='320' r='140' fill='rgba(255,255,255,.04)'/%3E%3C/svg%3E") no-repeat center/cover;
+  pointer-events:none;
+}
+.hero-content{position:relative;z-index:1}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+  color:#fff;font-size:.8rem;font-weight:500;padding:5px 14px;border-radius:20px;
+  margin-bottom:24px;
+}
+.hero h1{font-size:clamp(1.8rem,5vw,2.8rem);font-weight:800;line-height:1.15;margin-bottom:14px}
+.hero p{font-size:1.05rem;opacity:.88;margin-bottom:36px;max-width:520px;margin-left:auto;margin-right:auto}
+
+/* ─── Search Form ──────────────────────────────────────────────────────── */
+.search-box{
+  background:#fff;border-radius:var(--radius);padding:28px;
+  max-width:580px;margin:0 auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.18);
+}
+.search-label{font-weight:600;font-size:.85rem;color:#444;margin-bottom:10px;display:block;text-align:left;text-transform:uppercase;letter-spacing:.05em}
+.search-row{display:flex;gap:10px}
+.plate-input{
+  flex:1;padding:14px 18px;border:2px solid var(--gray-light);border-radius:var(--radius-sm);
+  font-size:1.2rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#1a1a2e;
+  transition:border-color .2s;
+}
+.plate-input:focus{border-color:var(--blue)}
+.plate-input::placeholder{font-weight:400;letter-spacing:.04em;color:#aaa;font-size:1rem}
+.btn-search{
+  padding:14px 28px;background:var(--blue);color:#fff;border-radius:var(--radius-sm);
+  font-size:1rem;font-weight:700;white-space:nowrap;
+  transition:background .2s,transform .1s;
+}
+.btn-search:hover{background:var(--blue-dark)}
+.btn-search:active{transform:scale(.97)}
+.search-note{text-align:center;margin-top:10px;font-size:.78rem;color:#888}
+
+/* ─── Trust badges ─────────────────────────────────────────────────────── */
+.trust-row{
+  display:flex;flex-wrap:wrap;gap:20px;justify-content:center;margin-top:40px;
+}
+.trust-item{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.9);font-size:.88rem;font-weight:500}
+.trust-icon{font-size:1.1rem}
+
+/* ─── Features ─────────────────────────────────────────────────────────── */
+.section{padding:60px 0}
+.section-title{text-align:center;font-size:1.6rem;font-weight:700;margin-bottom:8px;color:#1a1a2e}
+.section-sub{text-align:center;color:var(--gray);margin-bottom:40px;font-size:.95rem}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.feature-card{
+  background:#fff;border-radius:var(--radius);padding:28px 22px;text-align:center;
+  box-shadow:var(--card-shadow);transition:transform .2s;
+}
+.feature-card:hover{transform:translateY(-4px)}
+.feature-icon{font-size:2.2rem;margin-bottom:14px}
+.feature-title{font-weight:700;font-size:.95rem;margin-bottom:6px;color:#1a1a2e}
+.feature-desc{font-size:.82rem;color:var(--gray);line-height:1.55}
+
+/* ─── How it works ─────────────────────────────────────────────────────── */
+.steps-bg{background:linear-gradient(135deg,var(--blue-dark),var(--blue));padding:60px 0;color:#fff}
+.steps-title{text-align:center;font-size:1.6rem;font-weight:700;margin-bottom:8px}
+.steps-sub{text-align:center;opacity:.8;margin-bottom:40px;font-size:.95rem}
+.steps-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.step{display:flex;align-items:flex-start;gap:16px;background:rgba(255,255,255,.1);border-radius:var(--radius);padding:22px 20px;flex:1;min-width:180px;max-width:210px;border:1px solid rgba(255,255,255,.15)}
+.step-num{width:32px;height:32px;border-radius:50%;background:#fff;color:var(--blue);font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-title{font-weight:700;font-size:.9rem;margin-bottom:4px}
+.step-desc{font-size:.78rem;opacity:.82;line-height:1.5}
+
+/* ─── Loading View ─────────────────────────────────────────────────────── */
+#view-loading{padding:80px 0;text-align:center}
+.loading-plate{font-size:2rem;font-weight:800;color:var(--blue);letter-spacing:.12em;margin-bottom:8px}
+.loading-title{font-size:1rem;color:var(--gray);margin-bottom:40px}
+.progress-list{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.progress-item{
+  background:#fff;border-radius:var(--radius-sm);padding:16px 20px;
+  display:flex;align-items:center;gap:14px;box-shadow:var(--card-shadow);
+}
+.prog-icon{font-size:1.2rem;width:28px;text-align:center;flex-shrink:0}
+.prog-label{flex:1;font-size:.9rem;font-weight:500;text-align:left}
+.prog-status{font-size:.78rem;font-weight:600;color:var(--gray)}
+.prog-status.done{color:var(--green)}
+.prog-status.running{color:var(--blue)}
+.prog-status.error{color:var(--red)}
+.spinner{
+  width:18px;height:18px;border:2.5px solid var(--gray-light);
+  border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ─── Payment View ─────────────────────────────────────────────────────── */
+#view-payment{padding:60px 0}
+.payment-card{
+  max-width:460px;margin:0 auto;background:#fff;border-radius:var(--radius);
+  padding:36px 32px;text-align:center;box-shadow:var(--card-shadow);
+}
+.payment-title{font-size:1.4rem;font-weight:800;color:#1a1a2e;margin-bottom:6px}
+.payment-sub{color:var(--gray);font-size:.9rem;margin-bottom:28px}
+.payment-price{font-size:2.6rem;font-weight:800;color:var(--blue);margin-bottom:4px}
+.payment-price span{font-size:1rem;font-weight:500;color:var(--gray)}
+.payment-desc{font-size:.82rem;color:var(--gray);margin-bottom:28px}
+.qr-placeholder{
+  width:200px;height:200px;border:3px dashed var(--gray-light);border-radius:8px;
+  margin:0 auto 16px;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:8px;color:var(--gray);font-size:.82rem;text-align:center;
+  position:relative;overflow:hidden;
+}
+.qr-placeholder img{width:200px;height:200px;object-fit:contain}
+.qr-key-label{font-size:.78rem;color:var(--gray);margin-bottom:20px}
+.qr-key{font-weight:600;color:#1a1a2e;font-size:.88rem;word-break:break-all}
+.payment-actions{display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.btn-pix{
+  background:#32bcad;color:#fff;border-radius:var(--radius-sm);
+  padding:14px 20px;font-size:1rem;font-weight:700;transition:background .2s;
+}
+.btn-pix:hover{background:#29a99b}
+.btn-skip{background:none;color:var(--blue);font-size:.9rem;font-weight:500;padding:8px}
+.btn-skip:hover{text-decoration:underline}
+.payment-security{margin-top:20px;font-size:.75rem;color:var(--gray);display:flex;align-items:center;justify-content:center;gap:6px}
+.poll-timer{font-size:.82rem;color:var(--gray);margin-top:12px}
+
+/* ─── Results View ─────────────────────────────────────────────────────── */
+#view-results{padding:40px 0}
+.results-header{
+  background:linear-gradient(135deg,var(--blue-dark),var(--blue));
+  color:#fff;border-radius:var(--radius);padding:28px 32px;margin-bottom:24px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+}
+.results-plate{font-size:1.8rem;font-weight:800;letter-spacing:.12em}
+.results-meta{font-size:.85rem;opacity:.85}
+.results-meta strong{display:block;font-size:1rem;opacity:1}
+.btn-pdf{
+  background:#fff;color:var(--blue);padding:10px 20px;border-radius:var(--radius-sm);
+  font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:8px;
+  transition:background .15s;
+}
+.btn-pdf:hover{background:rgba(255,255,255,.9)}
+.btn-new{
+  background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);
+  padding:10px 20px;border-radius:var(--radius-sm);font-weight:600;font-size:.9rem;
+  transition:background .15s;
+}
+.btn-new:hover{background:rgba(255,255,255,.25)}
+
+/* ─── Result sections ──────────────────────────────────────────────────── */
+.result-section{background:#fff;border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--card-shadow)}
+.result-section-header{display:flex;align-items:center;gap:10px;margin-bottom:20px;cursor:pointer;user-select:none}
+.section-icon{font-size:1.3rem}
+.section-title-text{font-weight:700;font-size:1rem;flex:1}
+.section-badge{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px}
+.badge-ok{background:var(--green-bg);color:var(--green)}
+.badge-alert{background:var(--yellow-bg);color:#b36f00}
+.badge-error{background:var(--red-bg);color:var(--red)}
+.badge-neutral{background:var(--blue-bg);color:var(--blue)}
+.badge-loading{background:var(--gray-light);color:var(--gray)}
+.section-chevron{font-size:.9rem;color:var(--gray);transition:transform .2s}
+.section-chevron.open{transform:rotate(180deg)}
+
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.result-field{
+  background:#f8fafc;border-radius:var(--radius-sm);padding:12px 14px;
+  border-left:3px solid var(--blue-light);
+}
+.field-label{font-size:.7rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.field-value{font-size:.92rem;font-weight:600;color:#1a1a2e;word-break:break-word}
+.field-value.ok{color:var(--green)}
+.field-value.alert{color:var(--red)}
+.field-value.unknown{color:var(--gray)}
+
+.restriction-row{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  border-radius:var(--radius-sm);margin-bottom:8px;
+}
+.restriction-row.ok{background:var(--green-bg)}
+.restriction-row.bad{background:var(--red-bg)}
+.restriction-label{font-size:.82rem;font-weight:500}
+.restriction-label.ok{color:var(--green)}
+.restriction-label.bad{color:var(--red)}
+
+.photos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:4px}
+.photo-thumb{border-radius:var(--radius-sm);overflow:hidden;aspect-ratio:4/3;background:var(--gray-light);cursor:pointer;transition:transform .2s}
+.photo-thumb:hover{transform:scale(1.04)}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.no-photos{color:var(--gray);font-size:.88rem;text-align:center;padding:20px}
+
+.sinistro-table{width:100%;border-collapse:collapse;font-size:.85rem}
+.sinistro-table th{background:var(--blue-bg);color:var(--blue);font-weight:700;padding:10px 12px;text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em}
+.sinistro-table td{padding:10px 12px;border-bottom:1px solid var(--gray-light)}
+.sinistro-table tr:last-child td{border-bottom:none}
+
+.leilao-item{border:1px solid var(--gray-light);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px}
+.leilao-item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.leilao-item-title{font-weight:700;font-size:.9rem;color:var(--red)}
+.leilao-item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.leilao-mini-field{font-size:.78rem}
+.leilao-mini-label{color:var(--gray);font-size:.68rem;text-transform:uppercase;font-weight:700}
+.leilao-mini-value{color:#1a1a2e;font-weight:500}
+
+/* ─── Raw data panel ───────────────────────────────────────────────────── */
+.raw-toggle{font-size:.75rem;color:var(--blue);cursor:pointer;margin-top:12px;display:inline-block}
+.raw-toggle:hover{text-decoration:underline}
+.raw-data{background:#f4f6f9;border-radius:6px;padding:12px;font-family:monospace;font-size:.72rem;overflow:auto;max-height:280px;margin-top:8px;white-space:pre-wrap;word-break:break-word;display:none}
+
+/* ─── Lightbox ─────────────────────────────────────────────────────────── */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:1000;display:flex;align-items:center;justify-content:center}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:8px}
+.lightbox-close{position:absolute;top:20px;right:24px;font-size:2rem;color:#fff;cursor:pointer;line-height:1}
+
+/* ─── Error banner ─────────────────────────────────────────────────────── */
+.error-banner{
+  background:var(--red-bg);border:1px solid #f5c6c6;color:var(--red);
+  padding:14px 18px;border-radius:var(--radius-sm);font-size:.88rem;
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;
+}
+
+/* ─── Footer ───────────────────────────────────────────────────────────── */
+.site-footer{background:#1a1a2e;color:rgba(255,255,255,.6);padding:30px 0;text-align:center;font-size:.82rem;margin-top:40px}
+.footer-logo{color:#fff;font-weight:700;font-size:1rem;margin-bottom:8px}
+
+/* ─── Responsive ───────────────────────────────────────────────────────── */
+@media(max-width:580px){
+  .hero{padding:50px 0 60px}
+  .hero h1{font-size:1.7rem}
+  .search-row{flex-direction:column}
+  .btn-search{width:100%;text-align:center}
+  .results-header{flex-direction:column}
+  .btn-pdf,.btn-new{width:100%;justify-content:center;text-align:center}
+  .steps-row{flex-direction:column;align-items:center}
+  .step{max-width:100%;width:100%}
+  .result-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:380px){
+  .result-grid{grid-template-columns:1fr}
+}
+
+@media print{
+  /* Mostra só a view de resultados */
+  body{background:#fff!important;font-size:11pt}
+  #view-home,#view-loading,#view-payment{display:none!important}
+  #view-results{display:block!important}
+
+  /* Esconde elementos de navegação */
+  .btn-pdf,.btn-new,.raw-toggle,#raw-panel,
+  .section-chevron,.lightbox{display:none!important}
+
+  /* Remove sombras e bordas desnecessárias */
+  .result-section{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid;margin-bottom:12pt}
+  .result-section-header{background:#1a1a2e!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+  /* Header da placa */
+  .results-header{background:#1a1a2e!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:12pt}
+
+  /* Grid de campos */
+  .result-grid{grid-template-columns:repeat(3,1fr)!important}
+  .result-field{break-inside:avoid}
+
+  /* Fotos: limita tamanho */
+  .foto-item{width:120pt!important;height:90pt!important}
+  .fotos-grid{gap:6pt!important}
+
+  /* Evita quebra de página no meio de seções */
+  .result-section-header{break-after:avoid}
+  #body-dados,#body-leilao,#body-gravame,#body-sinistro{break-before:avoid}
+
+  /* Página */
+  @page{margin:1.5cm}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!--  HEADER                                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="container header-inner">
+    <div class="logo">
+      <div class="logo-icon">🚗</div>
+      <span>Vistoriador<strong>Online</strong></span>
+      <span class="logo-badge">Oficial</span>
+    </div>
+    <div class="header-phone">📞 Suporte 24h</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!--  VIEW: HOME                                                              -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section id="view-home">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge">✅ +50.000 consultas realizadas</div>
+      <h1>Consulte qualquer veículo<br>pela placa agora</h1>
+      <p>Laudo completo com dados do DETRAN, histórico de leilão, gravame, sinistros e fotos em segundos.</p>
+
+      <div class="search-box">
+        <label class="search-label" for="plate-input">🔍 Digite a placa do veículo</label>
+        <div class="search-row">
+          <input
+            type="text"
+            id="plate-input"
+            class="plate-input"
+            placeholder="ABC-1234 ou BRA2E19"
+            maxlength="8"
+            autocomplete="off"
+            autocapitalize="characters"
+          >
+          <button class="btn-search" id="btn-search">Consultar</button>
+        </div>
+        <p class="search-note">🔒 Consulta 100% legal e segura · Resultado em até 30 segundos</p>
+      </div>
+
+      <div class="trust-row">
+        <div class="trust-item"><span class="trust-icon">🛡️</span> Dados oficiais DETRAN</div>
+        <div class="trust-item"><span class="trust-icon">⚡</span> Resultado imediato</div>
+        <div class="trust-item"><span class="trust-icon">🏆</span> +10 bases consultadas</div>
+        <div class="trust-item"><span class="trust-icon">📄</span> PDF do laudo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="section" style="background:#fff">
+    <div class="container">
+      <h2 class="section-title">O que você descobre na consulta</h2>
+      <p class="section-sub">Informações completas de múltiplas fontes em um único laudo</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📋</div>
+          <div class="feature-title">Dados do Veículo</div>
+          <div class="feature-desc">Marca, modelo, cor, chassi, RENAVAM, ano e situação no DETRAN.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔨</div>
+          <div class="feature-title">Histórico de Leilão</div>
+          <div class="feature-desc">Se o veículo já foi leiloado, com detalhes do evento e categoria.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-title">Restrições e Gravame</div>
+          <div class="feature-desc">Débitos de financiamento, alienação fiduciária e restrições judiciais.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚠️</div>
+          <div class="feature-title">Histórico de Sinistros</div>
+          <div class="feature-desc">Ocorrências de acidentes, roubo e recuperação registradas em seguradoras.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📷</div>
+          <div class="feature-title">Fotos do Veículo</div>
+          <div class="feature-desc">Imagens registradas no sistema nacional de vistoria veicular.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📄</div>
+          <div class="feature-title">PDF do Laudo</div>
+          <div class="feature-desc">Laudo completo em PDF para download e impressão imediata.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="steps-bg">
+    <div class="container">
+      <h2 class="steps-title">Como funciona</h2>
+      <p class="steps-sub">Simples, rápido e seguro em 4 passos</p>
+      <div class="steps-row">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-title">Digite a placa</div>
+            <div class="step-desc">No formato antigo (ABC-1234) ou Mercosul (BRA2E19).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-title">Consulta automática</div>
+            <div class="step-desc">Acessamos mais de 10 bases de dados simultaneamente.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-title">Pagamento seguro</div>
+            <div class="step-desc">PIX instantâneo. Taxa única e transparente.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div>
+            <div class="step-title">Laudo completo</div>
+            <div class="step-desc">Visualize online e baixe o PDF do laudo de vistoria.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section><!-- #view-home -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!--  VIEW: LOADING                                                           -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section id="view-loading" class="hidden">
+  <div class="container" style="padding-top:70px;padding-bottom:70px;text-align:center">
+    <div class="loading-plate" id="loading-plate-text">---</div>
+    <div class="loading-title">Consultando informações do veículo...</div>
+
+    <div class="progress-list" id="progress-list">
+      <div class="progress-item" id="prog-preliminares">
+        <div class="prog-icon">📋</div>
+        <div class="prog-label">Dados básicos do veículo</div>
+        <div class="prog-status" id="prog-s-preliminares">Aguardando...</div>
+      </div>
+      <div class="progress-item" id="prog-leilao">
+        <div class="prog-icon">🔨</div>
+        <div class="prog-label">Histórico de leilão</div>
+        <div class="prog-status" id="prog-s-leilao">Aguardando...</div>
+      </div>
+      <div class="progress-item" id="prog-gravame">
+        <div class="prog-icon">🔒</div>
+        <div class="prog-label">Gravame e restrições</div>
+        <div class="prog-status" id="prog-s-gravame">Aguardando...</div>
+      </div>
+      <div class="progress-item" id="prog-sinistro">
+        <div class="prog-icon">⚠️</div>
+        <div class="prog-label">Histórico de sinistros</div>
+        <div class="prog-status" id="prog-s-sinistro">Aguardando...</div>
+      </div>
+      <div class="progress-item" id="prog-fotos">
+        <div class="prog-icon">📷</div>
+        <div class="prog-label">Fotos do veículo</div>
+        <div class="prog-status" id="prog-s-fotos">Aguardando...</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!--  VIEW: PAYMENT                                                           -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section id="view-payment" class="hidden">
+  <div class="container">
+    <div class="payment-card">
+      <div class="payment-title">Acesso ao Laudo Completo</div>
+      <div class="payment-sub">Dados preliminares encontrados. Pague para ver o laudo completo.</div>
+
+      <div class="payment-price">R$ 29,90 <span>/ consulta</span></div>
+      <div class="payment-desc">Inclui dados do DETRAN, leilão, gravame, sinistros, fotos e PDF</div>
+
+      <div class="qr-placeholder" id="qr-area">
+        <div style="font-size:2.5rem">📱</div>
+        <div>QR Code PIX</div>
+        <div style="font-size:.7rem;opacity:.7">Será gerado após configurar EfíPay no proxy.php</div>
+        <img id="qr-img" src="" alt="QR Code PIX" style="display:none">
+      </div>
+
+      <div class="qr-key-label">
+        Ou copie a chave PIX:<br>
+        <span class="qr-key" id="pix-key-display">Configure EFIPAY_CHAVE_PIX no proxy.php</span>
+      </div>
+
+      <div id="payment-error" class="hidden" style="margin-top:12px"></div>
+
+      <div class="payment-actions">
+        <button class="btn-pix" id="btn-verificar-pix">✅ Já paguei — Verificar pagamento</button>
+        <button class="btn-skip" id="btn-skip-payment">Pular pagamento (modo demo)</button>
+      </div>
+
+      <div class="poll-timer" id="poll-timer"></div>
+      <div class="payment-security">🔒 Pagamento 100% seguro via PIX Banco Central</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!--  VIEW: RESULTS                                                           -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<section id="view-results" class="hidden fade-in">
+  <div class="container">
+
+    <!-- Header do resultado -->
+    <div class="results-header">
+      <div>
+        <div class="results-plate" id="res-plate">---</div>
+        <div class="results-meta">
+          <strong id="res-modelo">—</strong>
+          <span id="res-ano-cor">—</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="btn-pdf" id="btn-pdf" title="Baixar laudo em PDF">
+          📄 Baixar PDF
+        </button>
+        <button class="btn-new" id="btn-new-search">🔍 Nova consulta</button>
+      </div>
+    </div>
+
+    <!-- ── Seção: Dados do veículo ──────────────────────────────────────── -->
+    <div class="result-section" id="sec-dados">
+      <div class="result-section-header" onclick="toggleSection('dados')">
+        <span class="section-icon">📋</span>
+        <span class="section-title-text">Dados do Veículo</span>
+        <span class="section-badge badge-neutral" id="badge-dados">Carregando...</span>
+        <span class="section-chevron open" id="chev-dados">▼</span>
+      </div>
+      <div id="body-dados">
+        <div id="dados-content">
+          <div class="result-grid" id="dados-grid">
+            <!-- preenchido por JS -->
+          </div>
+          <div style="margin-top:20px">
+            <div style="font-weight:700;font-size:.85rem;margin-bottom:10px;color:#555">RESTRIÇÕES</div>
+            <div id="restricoes-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Seção: Leilão ─────────────────────────────────────────────────── -->
+    <div class="result-section" id="sec-leilao">
+      <div class="result-section-header" onclick="toggleSection('leilao')">
+        <span class="section-icon">🔨</span>
+        <span class="section-title-text">Histórico de Leilão</span>
+        <span class="section-badge badge-loading" id="badge-leilao">Carregando...</span>
+        <span class="section-chevron open" id="chev-leilao">▼</span>
+      </div>
+      <div id="body-leilao">
+        <div id="leilao-content"><!-- preenchido por JS --></div>
+      </div>
+    </div>
+
+    <!-- ── Seção: Gravame ────────────────────────────────────────────────── -->
+    <div class="result-section" id="sec-gravame">
+      <div class="result-section-header" onclick="toggleSection('gravame')">
+        <span class="section-icon">🔒</span>
+        <span class="section-title-text">Gravame e Restrições Financeiras</span>
+        <span class="section-badge badge-loading" id="badge-gravame">Carregando...</span>
+        <span class="section-chevron open" id="chev-gravame">▼</span>
+      </div>
+      <div id="body-gravame">
+        <div id="gravame-content"><!-- preenchido por JS --></div>
+      </div>
+    </div>
+
+    <!-- ── Seção: Sinistros ──────────────────────────────────────────────── -->
+    <div class="result-section" id="sec-sinistro">
+      <div class="result-section-header" onclick="toggleSection('sinistro')">
+        <span class="section-icon">⚠️</span>
+        <span class="section-title-text">Histórico de Sinistros</span>
+        <span class="section-badge badge-loading" id="badge-sinistro">Carregando...</span>
+        <span class="section-chevron open" id="chev-sinistro">▼</span>
+      </div>
+      <div id="body-sinistro">
+        <div id="sinistro-content"><!-- preenchido por JS --></div>
+      </div>
+    </div>
+
+    <!-- ── Seção: Fotos ──────────────────────────────────────────────────── -->
+    <div class="result-section" id="sec-fotos">
+      <div class="result-section-header" onclick="toggleSection('fotos')">
+        <span class="section-icon">📷</span>
+        <span class="section-title-text">Fotos do Veículo</span>
+        <span class="section-badge badge-loading" id="badge-fotos">Carregando...</span>
+        <span class="section-chevron open" id="chev-fotos">▼</span>
+      </div>
+      <div id="body-fotos">
+        <div class="photos-grid" id="fotos-grid"><!-- preenchido por JS --></div>
+      </div>
+    </div>
+
+    <!-- ── Dados técnicos brutos ──────────────────────────────────────────── -->
+    <div class="result-section">
+      <div class="result-section-header" onclick="toggleSection('raw')">
+        <span class="section-icon">🔧</span>
+        <span class="section-title-text">Dados Técnicos (JSON bruto)</span>
+        <span class="section-badge badge-neutral">Dev</span>
+        <span class="section-chevron" id="chev-raw">▼</span>
+      </div>
+      <div id="body-raw" style="display:none">
+        <div class="raw-data" id="raw-all" style="display:block"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!--  FOOTER                                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-logo">🚗 Vistoriador Online</div>
+    <div>Laudos de vistoria veicular · Dados oficiais</div>
+    <div style="margin-top:8px">© 2024 Vistoriador Online — Todos os direitos reservados</div>
+  </div>
+</footer>
+
+<!-- Lightbox (fotos) -->
+<div class="lightbox hidden" id="lightbox" onclick="closeLightbox()">
+  <span class="lightbox-close">✕</span>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!--  JAVASCRIPT                                                              -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<script>
+// ─── Configuração ─────────────────────────────────────────────────────────
+const PROXY_URL    = '/api/proxy';  // Vercel serverless function
+const HABILITAR_PIX = false;        // true = exibe tela de pagamento antes dos resultados
+const PRECO        = 'R$ 29,90';
+
+// ─── Estado global ────────────────────────────────────────────────────────
+const state = {
+  placa: '',
+  chassi: '',
+  dados: null,
+  leilao: null,
+  gravame: null,
+  sinistro: null,
+  fotos: null,
+  codConsulta: '',
+  codigoConsulta: '',
+  txid: '',
+  pollInterval: null,
+};
+
+// ─── Utilitários ──────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const show = id => $( id).classList.remove('hidden');
+const hide = id => $( id).classList.add('hidden');
+
+function showView(viewId) {
+  ['view-home','view-loading','view-payment','view-results'].forEach(v => hide(v));
+  show(viewId);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function setProgStatus(key, status, text) {
+  const el = $(`prog-s-${key}`);
+  if (!el) return;
+  el.textContent = text;
+  el.className = `prog-status ${status}`;
+}
+
+async function callProxy(action, extra = {}) {
+  const body = JSON.stringify({ action, placa: state.placa, ...extra });
+  const res = await fetch(PROXY_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body,
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+function escape(str) {
+  return String(str ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
+
+function naoConsta(val) {
+  if (!val) return true;
+  return /nao\s*consta|n\/a|^-*$/i.test(String(val).trim());
+}
+
+// ─── Busca e formatação da placa ──────────────────────────────────────────
+$('btn-search').addEventListener('click', startSearch);
+$('plate-input').addEventListener('keydown', e => { if (e.key === 'Enter') startSearch(); });
+$('plate-input').addEventListener('input', function() {
+  this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+});
+
+function startSearch() {
+  const raw = $('plate-input').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if (raw.length < 7) {
+    alert('Por favor, digite uma placa válida (mínimo 7 caracteres).');
+    return;
+  }
+  state.placa = raw;
+  state.dados = state.leilao = state.gravame = state.sinistro = state.fotos = null;
+  state.codConsulta = '';
+  $('loading-plate-text').textContent = formatPlate(raw);
+  ['preliminares','leilao','gravame','sinistro','fotos'].forEach(k => {
+    setProgStatus(k, '', 'Aguardando...');
+  });
+  showView('view-loading');
+  runConsultas();
+}
+
+function formatPlate(p) {
+  if (p.length === 7) {
+    if (/^[A-Z]{3}\d[A-Z]\d{2}$/.test(p)) return p.slice(0,3)+' '+p.slice(3); // Mercosul
+    return p.slice(0,3)+'-'+p.slice(3);
+  }
+  return p;
+}
+
+// ─── Consultas ────────────────────────────────────────────────────────────
+async function runConsultas() {
+  // 1. Preliminares — primeiro, pois precisamos do chassi para as demais
+  setProgStatus('preliminares', 'running', '⟳ Consultando...');
+  try {
+    const r = await callProxy('preliminares');
+    state.dados = r;
+    if (r.ok) {
+      setProgStatus('preliminares', 'done', '✓ Encontrado');
+      const bin = r.data?.conferi?.binAgregados ?? r.data?.binAgregados ?? {};
+      const conf0 = r.data?.conferi ?? r.data ?? {};
+      state.codigoConsulta = conf0._codigoConsulta ?? conf0.solicitacao?._attributes?.codigoConsulta ?? '';
+      state.codConsulta    = conf0.linkPesquisa ?? bin.linkPesquisa ?? '';
+      state.chassi         = bin.chassi ?? bin.Chassi ?? '';
+    } else {
+      setProgStatus('preliminares', 'error', '✗ ' + (r.error ?? 'Erro'));
+    }
+  } catch(e) {
+    state.dados = { ok: false, error: e.message };
+    setProgStatus('preliminares', 'error', '✗ Erro de rede');
+  }
+
+  // 2-5. Paralelas — passam o chassi obtido acima
+  const paralelas = [
+    { key: 'leilao',   action: 'leilao',   stateProp: 'leilao'   },
+    { key: 'gravame',  action: 'gravame',         stateProp: 'gravame'  },
+    { key: 'sinistro', action: 'sinistro',        stateProp: 'sinistro' },
+    { key: 'fotos',    action: 'fotos',           stateProp: 'fotos'    },
+  ];
+  paralelas.forEach(p => setProgStatus(p.key, 'running', '⟳ Consultando...'));
+
+  await Promise.allSettled(paralelas.map(async p => {
+    try {
+      const extra = state.chassi ? { chassi: state.chassi } : {};
+      const r = await callProxy(p.action, extra);
+      state[p.stateProp] = r;
+      setProgStatus(p.key, r.ok ? 'done' : 'error', r.ok ? '✓ Concluído' : ('✗ '+(r.error??'Erro')));
+    } catch(e) {
+      state[p.stateProp] = { ok: false, error: e.message };
+      setProgStatus(p.key, 'error', '✗ Erro de rede');
+    }
+  }));
+
+  // Decide próxima tela
+  await new Promise(r => setTimeout(r, 600));
+
+  if (HABILITAR_PIX) {
+    showView('view-payment');
+    initPayment();
+  } else {
+    showResults();
+  }
+}
+
+// ─── Pagamento PIX ────────────────────────────────────────────────────────
+async function initPayment() {
+  try {
+    const r = await callProxy('criar_pix', { nome: 'Cliente', cpf: '00000000000' });
+    if (r.ok && r.data) {
+      const qrImgUrl = r.data.qrcode?.imagemQrcode;
+      if (qrImgUrl) {
+        $('qr-img').src = `data:image/png;base64,${qrImgUrl}`;
+        $('qr-img').style.display = 'block';
+      }
+      const pixCopiaECola = r.data.qrcode?.qrcode ?? '';
+      $('pix-key-display').textContent = pixCopiaECola || r.data.chave || '—';
+      state.txid = r.data.txid ?? '';
+      if (state.txid) startPolling();
+    } else {
+      $('pix-key-display').textContent = r.error ?? 'Não configurado';
+    }
+  } catch(e) {
+    $('pix-key-display').textContent = 'Erro: ' + e.message;
+  }
+}
+
+function startPolling() {
+  let secs = 0;
+  state.pollInterval = setInterval(async () => {
+    secs += 5;
+    $('poll-timer').textContent = `Verificando automaticamente... (${secs}s)`;
+    try {
+      const r = await callProxy('verificar_pix', { txid: state.txid });
+      if (r.pago) {
+        clearInterval(state.pollInterval);
+        showResults();
+      }
+    } catch(_) {}
+  }, 5000);
+}
+
+$('btn-verificar-pix').addEventListener('click', async () => {
+  if (!state.txid) { showResults(); return; }
+  try {
+    const r = await callProxy('verificar_pix', { txid: state.txid });
+    if (r.pago) {
+      clearInterval(state.pollInterval);
+      showResults();
+    } else {
+      alert('Pagamento ainda não identificado. Aguarde alguns instantes.');
+    }
+  } catch(e) { alert('Erro ao verificar: ' + e.message); }
+});
+
+$('btn-skip-payment').addEventListener('click', () => {
+  clearInterval(state.pollInterval);
+  showResults();
+});
+
+// ─── Resultados ───────────────────────────────────────────────────────────
+function showResults() {
+  renderDados();
+  renderLeilao();
+  renderGravame();
+  renderSinistro();
+  renderFotos();
+  renderRaw();
+  showView('view-results');
+}
+
+// helpers de badge
+function setBadge(id, cls, text) {
+  const el = $(id);
+  el.className = `section-badge ${cls}`;
+  el.textContent = text;
+}
+
+// ─── Dados básicos ────────────────────────────────────────────────────────
+function renderDados() {
+  const r = state.dados;
+  if (!r || !r.ok) {
+    setBadge('badge-dados','badge-error','Erro na consulta');
+    $('dados-grid').innerHTML = `<div class="error-banner">❌ ${escape(r?.error ?? 'Falha na consulta de dados básicos')}</div>`;
+    return;
+  }
+
+  // tenta localizar o objeto binAgregados dentro da resposta XML→JSON
+  const raw   = r.data ?? {};
+  const conf  = raw.conferi ?? raw;
+  const bin   = conf.binAgregados ?? conf.bin ?? conf ?? {};
+  const link  = conf.linkPesquisa ?? raw.linkPesquisa ?? '';
+
+  if (link) state.codConsulta = link;
+  // codigoConsulta numérico para PDF (pode vir do atributo XML injetado pelo server)
+  if (conf._codigoConsulta) state.codigoConsulta = conf._codigoConsulta;
+
+  // Campos que SEMPRE aparecem (com '—' quando a API não retorna)
+  // RENAVAM vem de binAgregados.renavam (self-closing no XML = string vazia = mostra —)
+  const renavamVal = conf.renavam || conf.Renavam || conf.RENAVAM ||
+                     bin.renavam  || bin.Renavam  || bin.RENAVAM  || null;
+  const fieldsSempre = [
+    { label: 'Chassi',  val: bin.chassi  ?? bin.Chassi  ?? state.chassi ?? null, destaque: true },
+    { label: 'RENAVAM', val: renavamVal, destaque: true },
+  ];
+
+  // Campos opcionais — omitidos se a API não retornar
+  const fieldsOpcionais = [
+    { label: 'Marca',        val: bin.marca         ?? bin.Marca        },
+    { label: 'Modelo',       val: bin.modelo        ?? bin.Modelo       },
+    { label: 'Ano Modelo',   val: (bin.anoModelo ?? bin.AnoModelo) !== '0' ? (bin.anoModelo ?? bin.AnoModelo) : null },
+    { label: 'Ano Fab.',     val: (bin.anoFabricacao?? bin.AnoFabricacao)?? null },
+    { label: 'Cor',          val: bin.cor           ?? bin.Cor          },
+    { label: 'UF',           val: bin.Uf            ?? bin.uf           },
+    { label: 'Município',    val: bin.municipio     ?? bin.Municipio    },
+    { label: 'Combustível',  val: bin.combustivel   ?? bin.Combustivel  },
+    { label: 'Câmbio',       val: bin.caixaCambio   ?? bin.CaixaCambio  },
+    { label: 'Motor',        val: bin.motor         ?? bin.Motor        },
+    { label: 'Potência (cv)',val: bin.potencia !== '0' ? (bin.potencia ?? bin.Potencia) : null },
+    { label: 'Espécie',      val: bin.especie       ?? bin.Especie      },
+    { label: 'Procedência',  val: bin.procedencia   ?? bin.Procedencia  },
+    { label: 'Segmento',     val: bin.segmento      ?? bin.Segmento     },
+    { label: 'Grupo/Modelo', val: bin.grupoModeloVeiculo ?? null        },
+    { label: 'Tipo Chassi',  val: bin.tipoChassi    ?? null             },
+    { label: 'UF Faturado',  val: bin.uf_faturado   ?? null             },
+    { label: 'Doc Faturado', val: bin.docFaturado !== 'Não informado' ? (bin.docFaturado ?? null) : null },
+    { label: 'Situação',     val: bin.situacao      ?? bin.Situacao,  destaque: false, sit: true },
+  ].filter(f => f.val != null && String(f.val).trim() !== '');
+
+  const hasData = fieldsOpcionais.length > 0;
+
+  if (!hasData && fieldsSempre.every(f => f.val == null)) {
+    $('dados-grid').innerHTML = `<div style="color:var(--gray);font-size:.85rem;">Dados recebidos em formato não-mapeado. Veja os dados técnicos abaixo.</div>`;
+    setBadge('badge-dados','badge-neutral','Parcial');
+  } else {
+    // Renderiza todos os campos
+    const renderField = f => {
+      const cls = f.sit ? (/regular|circulação|circulacao/i.test(f.val??'') ? 'ok' : 'alert') : '';
+      const borderColor = f.destaque ? 'var(--blue)' : 'var(--blue-light)';
+      const val = f.val ?? '—';
+      return `<div class="result-field" style="border-left-color:${borderColor}">
+        <div class="field-label">${escape(f.label)}</div>
+        <div class="field-value ${cls}" style="${f.destaque && f.val ? 'font-family:monospace;font-size:.85rem;letter-spacing:.04em' : ''}">${escape(val)}</div>
+      </div>`;
+    };
+
+    $('dados-grid').innerHTML =
+      fieldsSempre.map(renderField).join('') +
+      fieldsOpcionais.map(renderField).join('');
+
+    setBadge('badge-dados','badge-ok','✓ Encontrado');
+
+    // Atualiza cabeçalho do resultado
+    const marca  = bin.marca  ?? '';
+    const modelo = bin.modelo ?? '';
+    const ano    = (bin.anoFabricacao ?? '');
+    const cor    = bin.cor ?? '';
+    if (marca || modelo) $('res-modelo').textContent = `${marca} ${modelo}`.trim();
+    const anoText = ano && ano !== '0' ? ano : '';
+    if (anoText || cor) $('res-ano-cor').textContent = [anoText, cor].filter(Boolean).join(' · ');
+  }
+
+  $('res-plate').textContent = formatPlate(state.placa);
+
+  // Restrições
+  const rests = [
+    { label: 'Restrição 1', val: bin.restricao1 ?? bin.Restricao1 },
+    { label: 'Restrição 2', val: bin.restricao2 ?? bin.Restricao2 },
+    { label: 'Restrição 3', val: bin.restricao3 ?? bin.Restricao3 },
+    { label: 'Restrição 4', val: bin.restricao4 ?? bin.Restricao4 },
+  ].filter(f => f.val != null);
+
+  if (rests.length) {
+    $('restricoes-list').innerHTML = rests.map(f => {
+      const ok = naoConsta(f.val);
+      return `<div class="restriction-row ${ok ? 'ok' : 'bad'}">
+        <span style="font-size:1rem">${ok ? '✅' : '⚠️'}</span>
+        <span class="restriction-label ${ok ? 'ok' : 'bad'}">
+          ${escape(f.label)}: <strong>${escape(f.val)}</strong>
+        </span>
+      </div>`;
+    }).join('');
+  } else {
+    $('restricoes-list').innerHTML = '<span style="color:var(--gray);font-size:.85rem">Dados de restrição não disponíveis nesta consulta.</span>';
+  }
+}
+
+// ─── Leilão ───────────────────────────────────────────────────────────────
+function renderLeilao() {
+  const r = state.leilao;
+  const el = $('leilao-content');
+  if (!r) { el.innerHTML = naoConstaMsg(); setBadge('badge-leilao','badge-neutral','N/D'); return; }
+  if (!r.ok) {
+    el.innerHTML = errMsg(r.error);
+    setBadge('badge-leilao','badge-error','Erro');
+    return;
+  }
+
+  const data = r.data;
+  // Formato pode variar. Tenta extrair lista de leilões.
+  // Estrutura CompanyConferi: conferi.conferiLeilaoCompleto.leilao2.leilao (obj ou array)
+  let items = [];
+  const clc = data?.conferi?.conferiLeilaoCompleto ?? data?.conferiLeilaoCompleto;
+  if (clc) {
+    const leilao2 = clc.leilao2;
+    if (Array.isArray(leilao2)) {
+      items = leilao2.map(l => l.leilao ?? l).filter(Boolean);
+    } else if (leilao2?.leilao) {
+      items = Array.isArray(leilao2.leilao) ? leilao2.leilao : [leilao2.leilao];
+    } else if (leilao2 && typeof leilao2 === 'object') {
+      items = [leilao2];
+    }
+  }
+  // Fallbacks genéricos para outros formatos
+  if (!items.length) {
+    if (Array.isArray(data))               items = data;
+    else if (Array.isArray(data?.data))    items = data.data;
+    else if (Array.isArray(data?.leiloes)) items = data.leiloes;
+    else if (Array.isArray(data?.result))  items = data.result;
+    else if (data && typeof data === 'object') {
+      outer: for (const k of Object.keys(data)) {
+        const v = data[k];
+        if (Array.isArray(v) && v.length > 0) { items = v; break; }
+        if (v && typeof v === 'object' && !Array.isArray(v)) {
+          for (const k2 of Object.keys(v)) {
+            if (Array.isArray(v[k2]) && v[k2].length > 0) { items = v[k2]; break outer; }
+          }
+        }
+      }
+    }
+  }
+
+  if (items.length === 0) {
+    el.innerHTML = `<div class="restriction-row ok" style="margin:0">
+      <span style="font-size:1.1rem">✅</span>
+      <span class="restriction-label ok"><strong>Nenhum registro de leilão encontrado</strong> para esta placa.</span>
+    </div>`;
+    setBadge('badge-leilao','badge-ok','✓ Sem ocorrências');
+    return;
+  }
+
+  setBadge('badge-leilao','badge-alert','⚠️ ' + items.length + ' registro(s)');
+  el.innerHTML = items.map(item => `
+    <div class="leilao-item">
+      <div class="leilao-item-header">
+        <span class="leilao-item-title">🔨 Leilão registrado</span>
+      </div>
+      <div class="leilao-item-grid">
+        ${Object.entries(item).filter(([,v]) => v != null && String(v).trim()).map(([k,v]) => `
+          <div class="leilao-mini-field">
+            <div class="leilao-mini-label">${escape(k)}</div>
+            <div class="leilao-mini-value">${escape(v)}</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ─── Gravame ──────────────────────────────────────────────────────────────
+function renderGravame() {
+  const r = state.gravame;
+  const el = $('gravame-content');
+  if (!r) { el.innerHTML = naoConstaMsg(); setBadge('badge-gravame','badge-neutral','N/D'); return; }
+  if (!r.ok) { el.innerHTML = errMsg(r.error); setBadge('badge-gravame','badge-error','Erro'); return; }
+
+  const data = r.data;
+
+  // Corpo vazio ou flag explícita = sem gravame
+  const semGravame =
+    r.semGravame ||
+    data == null ||
+    (typeof data === 'object' && Object.keys(data).length === 0) ||
+    (data?.raw !== undefined && !data.raw);
+
+  if (semGravame) {
+    el.innerHTML = `<div class="restriction-row ok" style="margin:0">
+      <span style="font-size:1.1rem">✅</span>
+      <span class="restriction-label ok"><strong>Sem gravame registrado.</strong> Veículo sem restrições financeiras.</span>
+    </div>`;
+    setBadge('badge-gravame','badge-ok','✓ Sem gravame');
+  } else {
+    setBadge('badge-gravame','badge-alert','⚠️ Gravame');
+    el.innerHTML = renderGenericObject(data);
+  }
+}
+
+// ─── Sinistros ────────────────────────────────────────────────────────────
+function renderSinistro() {
+  const r = state.sinistro;
+  const el = $('sinistro-content');
+  if (!r) { el.innerHTML = naoConstaMsg(); setBadge('badge-sinistro','badge-neutral','N/D'); return; }
+  if (!r.ok) { el.innerHTML = errMsg(r.error); setBadge('badge-sinistro','badge-error','Erro'); return; }
+
+  const data = r.data;
+  let items = [];
+  if (Array.isArray(data))              items = data;
+  else if (Array.isArray(data?.data))   items = data.data;
+  else if (Array.isArray(data?.sinistros)) items = data.sinistros;
+  else if (data && typeof data === 'object') {
+    for (const k of Object.keys(data)) {
+      if (Array.isArray(data[k]) && data[k].length > 0) { items = data[k]; break; }
+    }
+  }
+
+  if (items.length === 0) {
+    el.innerHTML = `<div class="restriction-row ok" style="margin:0">
+      <span style="font-size:1.1rem">✅</span>
+      <span class="restriction-label ok"><strong>Nenhum sinistro registrado.</strong></span>
+    </div>`;
+    setBadge('badge-sinistro','badge-ok','✓ Sem ocorrências');
+    return;
+  }
+
+  setBadge('badge-sinistro','badge-alert','⚠️ ' + items.length + ' sinistro(s)');
+  const allKeys = [...new Set(items.flatMap(i => Object.keys(i)))];
+  el.innerHTML = `<table class="sinistro-table">
+    <thead><tr>${allKeys.map(k => `<th>${escape(k)}</th>`).join('')}</tr></thead>
+    <tbody>
+      ${items.map(row => `<tr>${allKeys.map(k => `<td>${escape(row[k] ?? '—')}</td>`).join('')}</tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+// ─── Fotos ────────────────────────────────────────────────────────────────
+function renderFotos() {
+  const r = state.fotos;
+  const el = $('fotos-grid');
+  if (!r) { el.innerHTML = noPhotosMsg(); setBadge('badge-fotos','badge-neutral','N/D'); return; }
+  if (!r.ok) { el.innerHTML = errMsg(r.error); setBadge('badge-fotos','badge-error','Erro'); return; }
+
+  const data = r.data;
+  let urls = [];
+
+  // Formato NulloRisco: { imagensLeilao: { leiloes: [{ imagens: [{url}] }] } }
+  if (data?.imagensLeilao?.leiloes) {
+    urls = data.imagensLeilao.leiloes.flatMap(l =>
+      (l.imagens ?? []).map(i => i.url ?? i).filter(Boolean)
+    );
+  }
+  // Extrai URLs de qualquer formato possível se ainda não achou
+  if (!urls.length) {
+    if (Array.isArray(data)) {
+      urls = data.flatMap(d =>
+        d.url ? [d.url] : d.link ? [d.link] : d.imagem ? [d.imagem] : d.src ? [d.src] :
+        Object.values(d).filter(v => typeof v === 'string' && /^https?:/.test(v))
+      );
+    } else if (Array.isArray(data?.data)) {
+      urls = data.data.flatMap(d =>
+        typeof d === 'string' ? [d] :
+        Object.values(d).filter(v => typeof v === 'string' && /^https?:/.test(v))
+      );
+    } else if (Array.isArray(data?.imagens)) {
+      urls = data.imagens.map(i => i.url ?? i);
+    } else if (Array.isArray(data?.fotos)) {
+      urls = data.fotos.map(i => i.url ?? i);
+    } else {
+      const str = JSON.stringify(data ?? '');
+      const matches = str.match(/https?:\/\/[^"\\]+\.(jpg|jpeg|png|webp)/gi) ?? [];
+      urls = [...new Set(matches)];
+    }
+  }
+
+  if (urls.length === 0) {
+    el.innerHTML = noPhotosMsg();
+    setBadge('badge-fotos','badge-neutral','Sem fotos');
+    return;
+  }
+
+  setBadge('badge-fotos','badge-ok',`✓ ${urls.length} foto(s)`);
+  el.innerHTML = urls.map(url => `
+    <div class="photo-thumb" onclick="openLightbox('${url}')">
+      <img src="${url}" alt="Foto do veículo" loading="lazy" onerror="this.parentElement.style.display='none'">
+    </div>`).join('');
+}
+
+// ─── Raw data ─────────────────────────────────────────────────────────────
+function renderRaw() {
+  $('raw-all').textContent = JSON.stringify({
+    placa: state.placa,
+    dados: state.dados,
+    leilao: state.leilao,
+    gravame: state.gravame,
+    sinistro: state.sinistro,
+    fotos: state.fotos,
+  }, null, 2);
+}
+
+// ─── Helpers de render ────────────────────────────────────────────────────
+function renderGenericObject(obj, depth = 0) {
+  if (!obj || typeof obj !== 'object') {
+    return `<span class="field-value">${escape(String(obj))}</span>`;
+  }
+  if (depth > 3) return `<span class="field-value">${escape(JSON.stringify(obj))}</span>`;
+  return `<div class="result-grid" style="margin-top:${depth>0?'8px':'0'}">
+    ${Object.entries(obj).filter(([,v])=>v!=null).map(([k,v]) => `
+      <div class="result-field">
+        <div class="field-label">${escape(k)}</div>
+        <div class="field-value">${typeof v==='object'? renderGenericObject(v,depth+1) : escape(v)}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+function naoConstaMsg() {
+  return '<span style="color:var(--gray);font-size:.85rem">Dados não disponíveis nesta consulta.</span>';
+}
+function noPhotosMsg() {
+  return '<div class="no-photos">📷 Nenhuma foto disponível para esta placa.</div>';
+}
+function errMsg(err) {
+  return `<div class="error-banner">❌ ${escape(err ?? 'Erro desconhecido')}<br><small>Verifique o proxy.php e as credenciais.</small></div>`;
+}
+
+// ─── Toggle sections ──────────────────────────────────────────────────────
+function toggleSection(key) {
+  const body  = $(`body-${key}`);
+  const chev  = $(`chev-${key}`);
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (chev) chev.classList.toggle('open', !isOpen);
+}
+
+// ─── Lightbox ─────────────────────────────────────────────────────────────
+function openLightbox(url) {
+  $('lightbox-img').src = url;
+  show('lightbox');
+}
+function closeLightbox() { hide('lightbox'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+// ─── PDF — imprime via browser (Ctrl+P → Salvar como PDF) ────────────────
+$('btn-pdf').addEventListener('click', () => {
+  window.print();
+});
+
+// ─── Nova consulta ────────────────────────────────────────────────────────
+$('btn-new-search').addEventListener('click', () => {
+  clearInterval(state.pollInterval);
+  $('plate-input').value = '';
+  showView('view-home');
+  setTimeout(() => $('plate-input').focus(), 300);
+});
+</script>
+</body>
+</html>
