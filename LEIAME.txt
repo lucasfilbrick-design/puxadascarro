@@ -1,0 +1,66 @@
+═══════════════════════════════════════════════════════════════
+  VISTORIADOR ONLINE — RÉPLICA
+  Arquivos: index.html + server.js (Node.js)
+═══════════════════════════════════════════════════════════════
+
+COMO RODAR LOCALMENTE (Node.js já instalado)
+─────────────────────────────────────────────
+Abra o terminal nesta pasta e execute:
+
+    node server.js
+
+Depois abra no navegador: http://localhost:3000
+
+
+COMO HOSPEDAR (servidor PHP — hospedagem compartilhada)
+────────────────────────────────────────────────────────
+Use o arquivo proxy.php no lugar do server.js:
+1. Faça upload de index.html e proxy.php para o servidor
+2. Acesse via browser — funciona direto
+
+Para VPS/servidor com Node.js:
+1. Copie os arquivos (index.html, server.js, package.json)
+2. Execute: node server.js
+3. Aponte seu domínio para a porta 3000 (ou use nginx como proxy)
+
+
+CONFIGURAÇÃO DO PAGAMENTO PIX (opcional)
+─────────────────────────────────────────
+Edite server.js e preencha suas credenciais EfíPay:
+
+    const EFIPAY_CLIENT_ID     = 'seu_client_id';
+    const EFIPAY_CLIENT_SECRET = 'seu_client_secret';
+    const EFIPAY_CHAVE_PIX     = 'sua_chave_pix';
+
+Depois em index.html, mude:
+    const HABILITAR_PIX = false;
+para:
+    const HABILITAR_PIX = true;
+
+
+STATUS DAS APIs TESTADAS
+─────────────────────────
+✅ CompanyConferi — Dados básicos (Preliminares): FUNCIONANDO
+✅ NulloRisco — Sinistro (com chassi): FUNCIONANDO
+✅ NulloRisco — Fotos (com chassi): FUNCIONANDO
+✅ NulloRisco — Leilão (com chassi): FUNCIONANDO
+⚠️ DespachasBrasil — Gravame: retorna vazio (autenticação diferente)
+⚠️ CompanyConferi — PDF: depende do código de consulta ativo
+⚙️ EfíPay PIX: requer credenciais próprias
+
+
+FLUXO DAS APIs
+──────────────
+1. Preliminares → CompanyConferi /conferiAgregados.php (POST, retorna XML)
+   → extrai: marca, modelo, chassi, RENAVAM, situação, restrições...
+
+2. Leilão → NulloRisco /api/consulta/placachassi (POST placa+chassi)
+3. Sinistro → NulloRisco /v1/sinistro/consulta3 (POST placa+chassi)
+4. Fotos → NulloRisco /v1/imagem/consulta (POST placa+chassi)
+   → retorna: imagensLeilao.leiloes[].imagens[].url
+
+5. Gravame → DespachasBrasil /v1/consultagravame/consulta
+6. PDF → CompanyConferi /gerar-pdf/
+7. PIX → EfíPay v2/cob + webhook
+
+═══════════════════════════════════════════════════════════════
